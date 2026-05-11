@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="hy">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>Getap Resort &amp; Spa — Arzni, Armenia</title>
+    <meta name="description" content="Հանգստի ու բուժման կենտրոն Արզնիում, Երևանից 16 կմ հեռու։ Շքեղ սենյակներ, Spa, ռեստորան, ջեռուցվող լողավազան։" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Noto+Serif+Armenian:wght@400;500;600;700&family=Noto+Sans+Armenian:wght@300;400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <script>
+      /* ── Yandex Taxi deep-link ── */
+      function openTaxiToGetap() {
+        var deepLink = "yandextaxi://route?end-lat=40.31265&end-lon=44.58835&end-address=Getap%20Resort";
+        var fallback  = "https://yandex.com/maps/?rtext=~40.31265,44.58835&rtt=auto";
+        window.location.href = deepLink;
+        setTimeout(function () { window.location.href = fallback; }, 1200);
+      }
+      document.addEventListener('click', function (e) {
+        var link = e.target.closest('a[href*="appmetrica.yandex.com"], a[href*="redirect.appmetrica"]');
+        if (link) { e.preventDefault(); e.stopPropagation(); openTaxiToGetap(); }
+      }, true);
+
+      /* ── Pool photo carousels ── */
+      (function () {
+        var OUTDOOR = [
+          '/assets/Getap__8_(1)_1777893382113.JPG',
+          '/assets/Getap__78_1777893382177.JPG',
+          '/assets/Getap__7_(3)_1777893382209.JPG'
+        ];
+        var INDOOR = [
+          '/assets/Getap__62_(1)_1777893382247.JPG',
+          '/assets/Getap__61_(1)_1777893382313.JPG',
+          '/assets/Getap__65_(3)_1777893382351.JPG',
+          '/assets/Getap__63_(2)_1777893382393.JPG',
+          '/assets/Getap__64_(2)_1777893382437.JPG'
+        ];
+        var SAUNA = [
+          '/assets/Getap__79_(3)_1778166649823.JPG'
+        ];
+
+        function buildCarousel(section, newPhotos) {
+          if (section.__carouselDone) return;
+          var parallaxDiv = section.children[0];
+          if (!parallaxDiv) return;
+          var baseImg = parallaxDiv.querySelector('img');
+          if (!baseImg) return;
+          section.__carouselDone = true;
+
+          newPhotos.forEach(function (src) {
+            var img = document.createElement('img');
+            img.src  = src; img.alt = '';
+            img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:0;transition:opacity 0.75s cubic-bezier(0.4,0,0.2,1);pointer-events:none;will-change:opacity;';
+            parallaxDiv.appendChild(img);
+          });
+
+          var total = 1 + newPhotos.length, current = 0;
+          var dotsWrap = document.createElement('div');
+          dotsWrap.style.cssText = 'position:absolute;bottom:72px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;z-index:30;pointer-events:auto;';
+
+          for (var d = 0; d < total; d++) {
+            (function (idx) {
+              var dot = document.createElement('span');
+              dot.style.cssText = 'display:block;height:5px;border-radius:3px;cursor:pointer;background:rgba(255,255,255,' + (idx===0?'0.95':'0.35') + ');width:' + (idx===0?'22px':'6px') + ';transition:all 0.35s ease;';
+              dot.addEventListener('click', function () { goTo(idx); });
+              dotsWrap.appendChild(dot);
+            })(d);
+          }
+          section.appendChild(dotsWrap);
+
+          function updateDots() {
+            Array.from(dotsWrap.children).forEach(function (dot, i) {
+              dot.style.background = 'rgba(255,255,255,' + (i===current?'0.95':'0.35') + ')';
+              dot.style.width = i===current ? '22px' : '6px';
+            });
+          }
+          function goTo(idx) {
+            idx = ((idx % total) + total) % total;
+            Array.from(parallaxDiv.children).slice(1).forEach(function (img, i) { img.style.opacity = i===idx-1?'1':'0'; });
+            current = idx; updateDots();
+          }
+          var autoTimer = setInterval(function () { goTo(current + 1); }, 4000);
+          function resetTimer() { clearInterval(autoTimer); autoTimer = setInterval(function () { goTo(current + 1); }, 4000); }
+          var touchX = 0;
+          section.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; }, { passive: true });
+          section.addEventListener('touchend', function (e) {
+            var diff = touchX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 55) { goTo(current + (diff > 0 ? 1 : -1)); resetTimer(); }
+          }, { passive: true });
+          var mouseX = 0, dragging = false;
+          section.addEventListener('mousedown', function (e) { mouseX = e.clientX; dragging = true; });
+          section.addEventListener('mouseup',   function (e) {
+            if (!dragging) return; dragging = false;
+            var diff = mouseX - e.clientX;
+            if (Math.abs(diff) > 55) { goTo(current + (diff > 0 ? 1 : -1)); resetTimer(); }
+          });
+          section.addEventListener('mouseleave', function () { dragging = false; });
+        }
+
+        function tryInit() {
+          var wf = document.getElementById('water-features');
+          if (!wf || wf.children.length < 3) { requestAnimationFrame(tryInit); return; }
+          var kids = wf.children;
+          if (!kids[0].querySelector('img') || !kids[1].querySelector('img') || !kids[2].querySelector('img')) { requestAnimationFrame(tryInit); return; }
+          buildCarousel(kids[0], OUTDOOR);
+          buildCarousel(kids[1], INDOOR);
+          buildCarousel(kids[2], SAUNA);
+        }
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', tryInit); } else { tryInit(); }
+      })();
+    </script>
+    <link rel="stylesheet" href="/assets/index-gvK2ak0g.css">
+    <style>
+      .gs-fade  { opacity:0; transform:translateY(26px); transition:opacity 0.75s cubic-bezier(0.4,0,0.2,1), transform 0.75s cubic-bezier(0.4,0,0.2,1); }
+      .gs-slide { opacity:0; transform:translateX(26px); transition:opacity 0.75s cubic-bezier(0.4,0,0.2,1), transform 0.75s cubic-bezier(0.4,0,0.2,1); }
+      .gs-in    { opacity:1 !important; transform:translate(0,0) !important; }
+      .gs-delay1{ transition-delay:0.15s; }
+      .gs-delay2{ transition-delay:0.30s; }
+      .gs-img-zoom { width:100%;height:100%;object-fit:cover;object-position:center;transition:transform 1.1s ease;display:block; }
+      .gs-img-box:hover .gs-img-zoom { transform:scale(1.04); }
+      .gs-wa {
+        display:inline-flex;align-items:center;gap:8px;
+        padding:11px 24px;border:1px solid rgba(255,255,255,0.22);
+        font-family:Outfit,sans-serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;
+        color:#fff;text-decoration:none;transition:border-color 0.3s,color 0.3s;cursor:pointer;
+      }
+      .gs-wa:hover { border-color:#D4A853;color:#D4A853; }
+      @keyframes igDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.35;transform:scale(0.7)} }
+      @media(max-width:767px){
+        .gs-2col { grid-template-columns:1fr !important; }
+        .gs-img-box { height:260px !important; }
+        .gs-txt { padding:28px 0 !important; }
+        .gs-feat-grid { grid-template-columns:1fr 1fr !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="/assets/index-CfSjvk7-.js"></script>
+    <script>
+      (function shrinkReversedE() {
+        function wrapReversedE(node) {
+          if (node.nodeType === 3) {
+            var text = node.nodeValue;
+            if (text && text.indexOf('\u018E') !== -1) {
+              var parts = text.split('\u018E'), frag = document.createDocumentFragment();
+              for (var i = 0; i < parts.length; i++) {
+                if (parts[i]) frag.appendChild(document.createTextNode(parts[i]));
+                if (i < parts.length - 1) {
+                  var span = document.createElement('span');
+                  span.textContent = '\u018E';
+                  span.style.cssText = 'font-size:0.88em;vertical-align:baseline;';
+                  frag.appendChild(span);
+                }
+              }
+              node.parentNode.replaceChild(frag, node);
+            }
+          } else if (node.nodeType === 1 && node.tagName !== 'SCRIPT' && node.tagName !== 'STYLE') {
+            Array.from(node.childNodes).forEach(wrapReversedE);
+          }
+        }
+        function run() {
+          wrapReversedE(document.body);
+          var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(m) { m.addedNodes.forEach(wrapReversedE); });
+          });
+          observer.observe(document.body, { childList: true, subtree: true });
+        }
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', run); } else { run(); }
+      })();
+    </script>
+    <style>
+      @keyframes igPulse {
+        0%,100% { box-shadow: 0 0 0 0 rgba(225,48,108,0.45); }
+        50%      { box-shadow: 0 0 0 12px rgba(225,48,108,0); }
+      }
+      @keyframes igCountUp {
+        from { opacity:0; transform:translateY(12px); }
+        to   { opacity:1; transform:translateY(0); }
+      }
+      @keyframes igSlideIn {
+        from { opacity:0; transform:translateY(28px); }
+        to   { opacity:1; transform:translateY(0); }
+      }
+      #ig-live-banner { animation: igSlideIn 0.7s cubic-bezier(0.4,0,0.2,1) both; }
+      .ig-follow-btn {
+        display:inline-flex;align-items:center;gap:9px;
+        padding:13px 30px;
+        background:linear-gradient(135deg,#f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+        font-family:Outfit,sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;
+        color:#fff;text-decoration:none;border:none;cursor:pointer;
+        transition:transform 0.25s ease,opacity 0.25s ease;
+        border-radius:2px;
+      }
+      .ig-follow-btn:hover { transform:translateY(-2px);opacity:0.92; }
+    </style>
+    <script>
+      (function injectIgFollowers() {
+        function fmt(n) {
+          if (n >= 1000000) return (n/1000000).toFixed(1).replace(/\.0$/,'')+'M';
+          if (n >= 1000)    return (n/1000).toFixed(1).replace(/\.0$/,'')+'K';
+          return n.toString();
+        }
+        var IG_SVG = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>';
+        function insertBanner(count) {
+          var sec = document.getElementById('instagram');
+          if (!sec || sec.querySelector('#ig-live-banner')) return;
+          var container = sec.querySelector('[class*="max-w"]') || sec.querySelector('[class*="container"]') || sec.firstElementChild;
+          var banner = document.createElement('div');
+          banner.id = 'ig-live-banner';
+          banner.style.cssText = 'display:flex;flex-direction:column;align-items:center;padding:16px 24px 48px;text-align:center;';
+          banner.innerHTML =
+            /* ── live pill ── */
+            '<div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:6px 16px;margin-bottom:32px;border-radius:100px;">' +
+              '<span style="width:7px;height:7px;border-radius:50%;background:#e1306c;display:inline-block;flex-shrink:0;animation:igPulse 2s infinite;"></span>' +
+              '<span style="font-family:Outfit,sans-serif;font-size:10px;letter-spacing:0.28em;text-transform:uppercase;color:rgba(255,255,255,0.5);">Live Count</span>' +
+            '</div>' +
+            /* ── icon ── */
+            '<div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);display:flex;align-items:center;justify-content:center;margin-bottom:24px;flex-shrink:0;">' +
+              '<svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>' +
+            '</div>' +
+            /* ── big number ── */
+            '<div style="display:flex;align-items:flex-end;justify-content:center;gap:10px;line-height:1;margin-bottom:8px;">' +
+              '<span id="ig-live-count" style="font-family:\'DM Serif Display\',serif;font-size:clamp(64px,13vw,112px);color:#fff;font-weight:400;line-height:0.9;animation:igCountUp 0.6s 0.3s cubic-bezier(0.4,0,0.2,1) both;"></span>' +
+            '</div>' +
+            /* ── followers label ── */
+            '<div style="font-family:Outfit,sans-serif;font-size:11px;letter-spacing:0.32em;text-transform:uppercase;color:rgba(212,168,83,0.7);margin-bottom:28px;">Followers</div>' +
+            /* ── handle ── */
+            '<a href="https://www.instagram.com/getap_resort_arzni/" target="_blank" rel="noreferrer" ' +
+              'style="font-family:Outfit,sans-serif;font-size:13px;letter-spacing:0.1em;color:rgba(255,255,255,0.32);text-decoration:none;transition:color 0.3s;display:block;margin-bottom:36px;" ' +
+              'onmouseover="this.style.color=\'rgba(255,255,255,0.75)\'" onmouseout="this.style.color=\'rgba(255,255,255,0.32)\'">' +
+              '@getap_resort_arzni' +
+            '</a>' +
+            /* ── CTA button ── */
+            '<a href="https://www.instagram.com/getap_resort_arzni/" target="_blank" rel="noreferrer" class="ig-follow-btn">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>' +
+              'Follow on Instagram' +
+            '</a>' +
+            /* ── divider ── */
+            '<div style="width:1px;height:32px;background:rgba(255,255,255,0.08);margin:40px auto 0;"></div>';
+          if (container && container.firstElementChild) {
+            container.insertBefore(banner, container.firstElementChild);
+          } else if (container) {
+            container.appendChild(banner);
+          }
+        }
+        function animateCount(el, target) {
+          var start = 0, duration = 1800, startTime = null;
+          function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+          function step(ts) {
+            if (!startTime) startTime = ts;
+            var progress = Math.min((ts - startTime) / duration, 1);
+            el.textContent = fmt(Math.floor(ease(progress) * target));
+            if (progress < 1) requestAnimationFrame(step);
+            else el.textContent = fmt(target);
+          }
+          requestAnimationFrame(step);
+        }
+        var IG_FALLBACK = 8400;
+        function pollFollowers() {
+          fetch('/api/ig-followers')
+            .then(function(r){ return r.ok ? r.json() : null; })
+            .then(function(d){
+              var count = (d && d.followers) ? d.followers : IG_FALLBACK;
+              var sec = document.getElementById('instagram');
+              if (!sec) { setTimeout(pollFollowers, 500); return; }
+              insertBanner(count);
+              var el = document.getElementById('ig-live-count');
+              if (el) animateCount(el, count);
+            }).catch(function(){
+              var sec = document.getElementById('instagram');
+              if (!sec) return;
+              insertBanner(IG_FALLBACK);
+              var el = document.getElementById('ig-live-count');
+              if (el) animateCount(el, IG_FALLBACK);
+            });
+        }
+        function waitForIg() {
+          if (document.getElementById('instagram')) { pollFollowers(); } else {
+            var obs = new MutationObserver(function(){
+              if (document.getElementById('instagram')){ obs.disconnect(); pollFollowers(); }
+            });
+            obs.observe(document.body, { childList:true, subtree:true });
+          }
+        }
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', waitForIg); } else { waitForIg(); }
+        setInterval(pollFollowers, 60000);
+      })();
+    </script>
+    <script>
+    (function injectNewSections() {
+      var WA = 'https://wa.me/37499123456?text=';
+      var LABELS = {
+        reception: { hy:'Ռեցեпциа', ru:'Ресепшн', en:'Reception' },
+        kids:      { hy:'Երеchanganers Готи', ru:'Детская Зона', en:'Kids Zone' }
+      };
+      var TITLES = {
+        reception: { hy:'Voghjonom enk', ru:'Добро пожаловать', en:'Welcome' },
+        kids:      { hy:'Khaghahrапарак', ru:'Игровая Площадка', en:'Playground' }
+      };
+      var SUBS = {
+        reception: {
+          hy:'Dzер hangsti champarorduthyune sksvum e amragrmаn pahin. Mer retseptsiayi time koghkin e 24/7.',
+          ru:'Ваше путешествие к отдыху начинается с момента бронирования. Наша команда рядом 24/7.',
+          en:'Your journey to rest begins from the moment of booking. Our reception team is by your side 24/7.'
+        },
+        kids: {
+          hy:'Apaov, zvarchalov yev steghtsagortс mijavayer dzer yerekhaneeri hamar.',
+          ru:'Безопасная, весёлая и творческая среда для ваших детей, пока вы наслаждаетесь отдыхом.',
+          en:'A safe, fun, and creative environment for your children while you enjoy your rest.'
+        }
+      };
+      var FEATURES = {
+        reception: {
+          hy:['24/7 Reception','Luggage Storage','Tourist Guidance','Yerevan Transfer'],
+          ru:['Ресепшн 24/7','Хранение багажа','Туристические советы','Трансфер из Еревана'],
+          en:['24/7 Reception','Luggage Storage','Tourist Guidance','Yerevan Transfer']
+        },
+        kids: {
+          hy:['Safe Play Area','In Nature','Family Friendly','Excursions Organised'],
+          ru:['Безоп. игровая зона','На природе','Сем. удобства','Орг. экскурсий'],
+          en:['Safe Play Area','In Nature','Family Friendly','Excursions Organised']
+        }
+      };
+      var BTN_MSGS = {
+        reception: {
+          hy:['Book via WhatsApp','Hello, I would like to book at Getap Resort'],
+          ru:['Забронировать в WhatsApp','Здравствуйте, хочу забронировать в Getap Resort'],
+          en:['Book via WhatsApp','Hello, I would like to book at Getap Resort']
+        },
+        kids: {
+          hy:['Learn More via WhatsApp','Hello, I want to ask about the Kids Zone'],
+          ru:['Узнать в WhatsApp','Здравствуйте, хочу узнать о детской зоне'],
+          en:['Learn More via WhatsApp','Hello, I want to ask about the Kids Zone']
+        }
+      };
+      var WA_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
+      function detectLang() {
+        var btns = document.querySelectorAll('button');
+        for (var i = 0; i < btns.length; i++) {
+          var t = (btns[i].textContent||'').trim().toUpperCase();
+          if (t === 'RU' || t === 'EN' || t === 'HY') {
+            var col = window.getComputedStyle(btns[i]).color;
+            if (col && (col.indexOf('212')>-1 || col.indexOf('251')>-1 || col.indexOf('245')>-1)) return t.toLowerCase();
+          }
+        }
+        return 'hy';
+      }
+      function dot() {
+        return '<span style="width:5px;height:5px;border-radius:50%;background:#D4A853;margin-top:5px;flex-shrink:0;display:inline-block;"></span>';
+      }
+      function makeFeatures(list, bordered) {
+        return list.map(function(f){
+          var border = bordered ? 'border:1px solid rgba(255,255,255,0.07);padding:12px 14px;' : 'padding:4px 0;';
+          return '<div style="display:flex;align-items:flex-start;gap:10px;' + border + '">' + dot() +
+                 '<span style="font-family:Outfit,sans-serif;font-size:13px;color:rgba(255,255,255,0.62);">' + f + '</span></div>';
+        }).join('');
+      }
+      function makeSection(id, bg, imgSrc, imgRight, lang) {
+        var lbl   = LABELS[id][lang]   || LABELS[id].en;
+        var title = TITLES[id][lang]   || TITLES[id].en;
+        var sub   = SUBS[id][lang]     || SUBS[id].en;
+        var feats = FEATURES[id][lang] || FEATURES[id].en;
+        var btnPair = BTN_MSGS[id][lang] || BTN_MSGS[id].en;
+        var btnLabel = btnPair[0], waMsg = btnPair[1];
+        var bordered = (id === 'kids');
+        var featHTML = makeFeatures(feats, bordered);
+        var labelHTML = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;"><span style="display:inline-block;width:28px;height:1px;background:rgba(212,168,83,0.5);"></span><span style="font-family:Outfit,sans-serif;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(212,168,83,0.72);">' + lbl + '</span></div>';
+        var titleHTML = '<h2 style="font-family:\'DM Serif Display\',\'Noto Serif Armenian\',serif;font-size:clamp(30px,3.8vw,50px);font-weight:400;color:#fff;line-height:1.12;margin:0 0 18px;">' + title + '</h2>';
+        var subHTML   = '<p style="font-family:Outfit,sans-serif;font-size:14px;line-height:1.75;color:rgba(255,255,255,0.52);margin:0 0 26px;max-width:440px;">' + sub + '</p>';
+        var featWrap  = '<div class="gs-feat-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px;">' + featHTML + '</div>';
+        var btnHTML   = '<a href="' + WA + encodeURIComponent(waMsg) + '" target="_blank" rel="noreferrer" class="gs-wa">' + WA_SVG + btnLabel + '</a>';
+        var extraHTML = '';
+        if (id === 'reception') {
+          extraHTML = '<div style="display:flex;gap:36px;margin-bottom:28px;"><div><div style="font-family:Outfit,sans-serif;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(212,168,83,0.6);margin-bottom:4px;">Check-in</div><div style="font-family:\'DM Serif Display\',serif;font-size:28px;color:#fff;line-height:1;">14:00</div></div><div style="width:1px;background:rgba(255,255,255,0.08);"></div><div><div style="font-family:Outfit,sans-serif;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(212,168,83,0.6);margin-bottom:4px;">Check-out</div><div style="font-family:\'DM Serif Display\',serif;font-size:28px;color:#fff;line-height:1;">12:00</div></div></div>';
+        }
+        var textCol = '<div class="gs-txt gs-fade" style="padding:0 8px;">' + labelHTML + titleHTML + subHTML + featWrap + extraHTML + btnHTML + '</div>';
+        var imgCol  = '<div class="gs-img-box gs-slide" style="position:relative;height:540px;overflow:hidden;"><img src="' + imgSrc + '" alt="' + title + '" class="gs-img-zoom" /><div style="position:absolute;inset:0;border:1px solid rgba(255,255,255,0.05);pointer-events:none;"></div></div>';
+        var left  = imgRight ? textCol : imgCol;
+        var right = imgRight ? imgCol  : textCol;
+        return '<section id="' + id + '-section" style="background:' + bg + ';padding:96px 24px;"><div class="gs-2col" style="max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;">' + left + right + '</div></section>';
+      }
+      function observe() {
+        if (!window.IntersectionObserver) {
+          document.querySelectorAll('.gs-fade,.gs-slide').forEach(function(el){ el.classList.add('gs-in'); });
+          return;
+        }
+        var io = new IntersectionObserver(function(entries){
+          entries.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('gs-in'); io.unobserve(e.target); } });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.gs-fade,.gs-slide').forEach(function(el){ io.observe(el); });
+      }
+      function insert() {
+        var root = document.getElementById('root');
+        if (!root || !root.firstElementChild) { requestAnimationFrame(insert); return; }
+        var app = root.firstElementChild;
+        var children = Array.from(app.children);
+        if (children.length < 3) { requestAnimationFrame(insert); return; }
+        var lang = detectLang();
+        var aboutIdx = -1, roomsIdx = -1, confIdx = -1, locationIdx = -1;
+        children.forEach(function(el, i) {
+          var id = (el.id || '').toLowerCase();
+          if (id === 'about' || id === 'hotel-overview' || id === 'overview') aboutIdx = i;
+          if (id === 'rooms' || id === 'accommodation') roomsIdx = i;
+          if (id === 'conference' || id === 'meetings')  confIdx  = i;
+          if (id === 'location' || id === 'find-us')     locationIdx = i;
+        });
+        if (!document.getElementById('reception-section')) {
+          var recAfter;
+          if (roomsIdx > 0)       recAfter = children[roomsIdx - 1];
+          else if (aboutIdx > -1) recAfter = children[aboutIdx];
+          else                     recAfter = children[Math.min(2, children.length - 1)];
+          var recDiv = document.createElement('div');
+          recDiv.innerHTML = makeSection('reception', '#0d0d0d', '/assets/reception_new.JPG', true, lang);
+          var recEl = recDiv.firstElementChild;
+          if (recAfter && recAfter.nextSibling) { app.insertBefore(recEl, recAfter.nextSibling); } else { app.appendChild(recEl); }
+          children = Array.from(app.children);
+        }
+        if (!document.getElementById('kids-section')) {
+          var kidsAfter;
+          if (confIdx > -1)          kidsAfter = children[confIdx];
+          else if (locationIdx > -1) kidsAfter = children[locationIdx - 1];
+          else                        kidsAfter = children[children.length - 2];
+          var kidsDiv = document.createElement('div');
+          kidsDiv.innerHTML = makeSection('kids', '#111', '/assets/kids_zone.JPG', false, lang);
+          var kidsEl = kidsDiv.firstElementChild;
+          if (kidsAfter && kidsAfter.nextSibling) { app.insertBefore(kidsEl, kidsAfter.nextSibling); } else { app.appendChild(kidsEl); }
+        }
+        observe();
+      }
+      if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', insert); } else { insert(); }
+    })();
+    </script>
+  </body>
+</html>
